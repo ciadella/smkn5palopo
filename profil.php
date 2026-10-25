@@ -1,0 +1,50 @@
+<?php
+$halaman = 'profil';
+$judul = 'Profil Sekolah';
+require __DIR__ . '/includes/header.php';
+
+$misi = daftar_misi($cfg['misi']);
+?>
+
+<section class="page-banner" style="background-image:url('<?= img('hero.jpg', 'Banner') ?>')">
+  <div class="hero-overlay"></div>
+  <div class="container">
+    <h1>Profil Sekolah</h1>
+    <p class="crumb"><a href="index.php">Beranda</a> › Profil</p>
+  </div>
+</section>
+
+<section class="container section">
+  <div class="about">
+    <img src="<?= img('hero.jpg', 'Gedung sekolah') ?>" alt="Gedung sekolah">
+    <div>
+      <h2>Tentang <?= e($cfg['nama_sekolah']) ?></h2>
+      <p><?= e($cfg['tentang']) ?></p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-icon">📅</span><div><small>Tahun Berdiri</small><strong><?= e($cfg['tahun_berdiri']) ?></strong></div></div>
+    <div class="stat"><span class="stat-icon">👥</span><div><small>Jumlah Siswa</small><strong><?= e($cfg['jumlah_siswa']) ?></strong></div></div>
+    <div class="stat"><span class="stat-icon">👤</span><div><small>Jumlah Guru</small><strong><?= e($cfg['jumlah_guru']) ?></strong></div></div>
+  </div>
+
+  <h2 class="mt">Visi &amp; Misi</h2>
+  <div class="visimisi">
+    <div class="vm-box">
+      <h3>👁 Visi</h3>
+      <p class="quote">"<?= e($cfg['visi']) ?>"</p>
+    </div>
+    <div class="vm-box">
+      <h3>🎯 Misi</h3>
+      <ol>
+        <?php foreach ($misi as $m): ?><li><?= e($m) ?></li><?php endforeach; ?>
+      </ol>
+    </div>
+  </div>
+
+  <h2 class="mt">Sejarah Singkat</h2>
+  <p class="history"><?= nl2br(e($cfg['sejarah'])) ?></p>
+</section>
+
+<?php require __DIR__ . '/includes/footer.php'; ?>
