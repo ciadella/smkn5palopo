@@ -1,66 +1,58 @@
 # Website SMKN 5 Palopo
 
-Website profil sekolah SMKN 5 Palopo berbasis **PHP (PDO) + MySQL**.
-Berisi halaman Beranda, Profil, Jurusan, Galeri, dan Kontak (form pesan tersimpan ke database).
-
-## Teknologi
-- PHP 8+ (PDO)
-- MySQL / MariaDB
-- HTML, CSS, JavaScript
-- Server lokal: XAMPP atau Laragon
+Website profil sekolah berbasis **PHP**. Halaman: Beranda, Profil, Jurusan (+ detail), Galeri, dan Kontak.
+Semua isi website ada di **satu file**: `includes/konten.php`. Database hanya dipakai untuk menyimpan pesan dari form kontak.
 
 ## Struktur Folder
 ```
 smkn5palopo-website/
-├── index.php          # Beranda
-├── profil.php         # Profil sekolah
-├── jurusan.php        # Program keahlian
-├── galeri.php         # Galeri kegiatan & prestasi
-├── kontak.php         # Kontak + form pesan
+├── index.php            # Beranda
+├── profil.php           # Profil sekolah
+├── jurusan.php          # Daftar program keahlian
+├── jurusan_detail.php   # Detail satu jurusan (tombol Selengkapnya)
+├── galeri.php           # Galeri kegiatan & prestasi
+├── kontak.php           # Kontak + form pesan
 ├── includes/
-│   ├── config.php     # Koneksi database & fungsi bantu
-│   ├── teks.php       # Teks tetap website (slogan, visi, kontak, dll.)
+│   ├── konten.php       # ★ SEMUA ISI WEBSITE (teks, jurusan, kegiatan, prestasi)
+│   ├── config.php       # Pengaturan database (pesan) & fungsi bantu
 │   ├── header.php
 │   └── footer.php
 ├── assets/
 │   ├── css/style.css
 │   ├── js/main.js
-│   └── img/           # Foto (hero, gedung, kegiatan, prestasi, jurusan)
+│   └── img/             # Foto (logo, hero, gedung, kegiatan, prestasi, jurusan)
 ├── database/
-│   ├── smkn5palopo.sql   # Struktur + data awal database
-│   ├── tambahan.sql      # Tabel tabel_pesan (form kontak)
-│   └── data_contoh.sql   # Data contoh (opsional)
+│   └── pesan.sql        # Membuat database + tabel pesan (form kontak)
 ├── README.md
 └── .gitignore
 ```
 
-## Cara Menjalankan
-1. Salin folder proyek ke `htdocs` (XAMPP) atau `www` (Laragon).
+## Cara Menjalankan (Laragon / XAMPP)
+1. Salin folder proyek ke `C:\laragon\www\` (Laragon) atau `htdocs` (XAMPP).
 2. Jalankan **Apache** dan **MySQL**.
-3. Buat database `smkn_5_palopo`, lalu import lewat phpMyAdmin (tab **Import**), berurutan:
-   1. `database/smkn5palopo.sql`
-   2. `database/tambahan.sql` (wajib)
-   3. `database/data_contoh.sql` (opsional, jika tabel masih kosong)
-4. Sesuaikan host/port/user/password di `includes/config.php`
-   (bawaan: `127.0.0.1`, port `3307`, user `root`, tanpa password — ubah port ke `3306` jika MySQL Anda memakai port standar).
+3. Import `database/pesan.sql` (HeidiSQL: *File → Run SQL file…*, atau phpMyAdmin: tab *Import*).
+   Langkah ini hanya diperlukan agar form kontak bisa menyimpan pesan. Halaman lain tampil tanpa database.
+4. Jika perlu, sesuaikan port/user/password di `includes/config.php` (bawaan: port `3306`, user `root`, tanpa password).
 5. Buka `http://localhost/smkn5palopo-website/`.
 
-## Mengubah Isi Website
-| Isi | Lokasi |
+## Mengubah Isi Website — semuanya di `includes/konten.php`
+| Isi | Bagian di konten.php |
 |---|---|
-| Nama sekolah, sejarah, visi, misi, alamat | tabel `profil_sekolah` |
-| Jurusan | tabel `program_keahlian` |
-| Kegiatan | tabel `tabel_kegiatan` |
-| Prestasi | tabel `tabel_prestasi` |
-| Alamat, telepon, email, media sosial | tabel `tabel_kontak` |
-| Slogan, tagline, tentang, jumlah siswa/guru, jam operasional, link sosmed | `includes/teks.php` |
+| Nama sekolah, slogan, tagline | `nama_sekolah`, `slogan`, `tagline` |
+| Tentang, tahun berdiri, jumlah siswa/guru | `tentang`, `tahun_berdiri`, `jumlah_siswa`, `jumlah_guru` |
+| Sejarah, visi, misi | `sejarah`, `visi`, `misi` (satu poin per baris) |
+| Alamat, telepon, email, jam operasional, link sosmed | `alamat`, `telepon`, `email`, `jam_*`, `youtube`, `instagram`, `facebook` |
+| Gambar hero/banner tiap halaman | `hero` |
+| Jurusan + halaman detail | `jurusan` (nama, deskripsi, uraian, kompetensi, karier, gambar) |
+| Kegiatan | `kegiatan` |
+| Prestasi | `prestasi` |
 
-Misi: satu baris = satu poin.
+Untuk menambah jurusan/kegiatan/prestasi, salin satu blok lalu ubah isinya.
+Simpan file, lalu refresh browser.
 
 ## Foto
-Kolom foto di database berisi **nama file** (huruf kecil, tanpa spasi), misalnya `kegiatan1.jpg`,
-dan filenya diletakkan di `assets/img/`. Jika file belum ada, tampil placeholder biru.
-File tetap: `logo.png`, `hero.jpg`, `gedung.jpg`.
+Simpan di `assets/img/` dengan nama huruf kecil tanpa spasi (mis. `kegiatan4.jpg`), lalu tulis nama filenya
+di `konten.php`. Jika file belum ada, tampil placeholder biru. File tetap: `logo.png` dan `gedung.jpg` (foto di halaman Profil). Gambar hero tiap halaman diatur di bagian `hero` pada `konten.php`.
 
-## Catatan
-- Nama file gambar memakai huruf kecil semua agar tetap terbaca di server Linux/hosting.
+## Melihat Pesan Masuk
+Buka HeidiSQL/phpMyAdmin → database `smkn_5_palopo` → tabel `tabel_pesan`.

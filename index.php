@@ -3,10 +3,10 @@ $halaman = 'beranda';
 $judul = 'Beranda';
 require __DIR__ . '/includes/header.php';
 
-$kegiatan = $pdo->query('SELECT * FROM tabel_kegiatan ORDER BY tanggal DESC LIMIT 3')->fetchAll();
+$kegiatan = array_slice(urut_tanggal($cfg['kegiatan']), 0, 3);
 ?>
 
-<section class="hero" style="background-image:url('<?= img('hero.jpg', '') ?>')">
+<section class="hero" style="background-image:url('<?= img($cfg['hero']['beranda'], '') ?>')">
   <div class="hero-overlay"></div>
   <div class="container hero-content">
     <p class="hero-small">Selamat Datang di</p>
@@ -47,9 +47,9 @@ $kegiatan = $pdo->query('SELECT * FROM tabel_kegiatan ORDER BY tanggal DESC LIMI
   <div class="grid-3">
     <?php foreach ($kegiatan as $k): ?>
       <article class="news-card">
-        <img src="<?= img($k['foto'], 'Kegiatan') ?>" alt="<?= e($k['judul_kegiatan']) ?>">
+        <img src="<?= img($k['foto'], 'Kegiatan') ?>" alt="<?= e($k['judul']) ?>">
         <time><?= tanggal_indo($k['tanggal']) ?></time>
-        <h3><?= e($k['judul_kegiatan']) ?></h3>
+        <h3><?= e($k['judul']) ?></h3>
       </article>
     <?php endforeach; ?>
     <?php if (!$kegiatan): ?><p>Belum ada kegiatan.</p><?php endif; ?>
