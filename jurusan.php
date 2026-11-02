@@ -6,7 +6,7 @@ require __DIR__ . '/includes/header.php';
 $jurusan = $cfg['jurusan'];
 ?>
 
-<section class="page-banner" style="background-image:url('<?= img($cfg['hero']['jurusan'], 'Banner') ?>')">
+<section class="page-banner" style="background-image:url('<?= img('umum', $cfg['hero']['jurusan'], 'Banner') ?>')">
   <div class="hero-overlay"></div>
   <div class="container">
     <h1>Program Keahlian</h1>
@@ -19,7 +19,7 @@ $jurusan = $cfg['jurusan'];
   <div class="grid-2">
     <?php foreach ($jurusan as $kunci => $j): ?>
       <article class="major-card">
-        <img src="<?= img($j['gambar'], $j['nama']) ?>" alt="<?= e($j['nama']) ?>">
+        <img src="<?= img('jurusan', $j['gambar'], $j['nama']) ?>" alt="<?= e($j['nama']) ?>">
         <div class="major-body">
           <h3><?= e($j['nama']) ?></h3>
           <p><?= e($j['deskripsi']) ?></p>

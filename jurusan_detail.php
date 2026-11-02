@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/init.php';
 
 $id = $_GET['id'] ?? '';
 $j = $cfg['jurusan'][$id] ?? null;
@@ -17,7 +17,7 @@ if ($j) {
 }
 ?>
 
-<section class="page-banner" style="background-image:url('<?= img($cfg['hero']['jurusan'], 'Banner') ?>')">
+<section class="page-banner" style="background-image:url('<?= img('umum', $cfg['hero']['jurusan'], 'Banner') ?>')">
   <div class="hero-overlay"></div>
   <div class="container">
     <h1><?= e($judul) ?></h1>
@@ -32,7 +32,7 @@ if ($j) {
 <?php else: ?>
   <div class="detail-layout">
     <article class="detail-main">
-      <img class="detail-img" src="<?= img($j['gambar'], $j['nama']) ?>" alt="<?= e($j['nama']) ?>">
+      <img class="detail-img" src="<?= img('jurusan', $j['gambar'], $j['nama']) ?>" alt="<?= e($j['nama']) ?>">
 
       <h2>Tentang Jurusan</h2>
       <p class="history"><?= nl2br(e($uraian)) ?></p>

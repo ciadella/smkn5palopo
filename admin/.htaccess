@@ -1,0 +1,4 @@
+Options -Indexes
+<FilesMatch "^(config|auth|layout|crud)\.php$">
+  Require all denied
+</FilesMatch>

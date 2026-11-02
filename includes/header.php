@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/init.php';
 $halaman = $halaman ?? 'beranda';
 $judul   = $judul ?? $cfg['nama_sekolah'];
 
@@ -20,7 +20,7 @@ function aktif(string $a, string $b): string { return $a === $b ? 'active' : '';
 <header class="navbar">
   <div class="container nav-inner">
     <a href="index.php" class="brand">
-      <img src="<?= img('logo.png', 'Logo') ?>" alt="Logo" class="brand-logo">
+      <img src="<?= img('umum', $cfg['logo'], 'Logo') ?>" alt="Logo" class="brand-logo">
       <span class="brand-text">
         <strong><?= e($cfg['nama_sekolah']) ?></strong>
         <small><?= e($cfg['slogan']) ?></small>

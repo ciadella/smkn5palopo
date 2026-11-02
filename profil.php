@@ -7,7 +7,7 @@ $misi = $cfg['misi'];
 $kepsek = $cfg['kepala_sekolah'];
 ?>
 
-<section class="page-banner" style="background-image:url('<?= img($cfg['hero']['profil'], 'Banner') ?>')">
+<section class="page-banner" style="background-image:url('<?= img('umum', $cfg['hero']['profil'], 'Banner') ?>')">
   <div class="hero-overlay"></div>
   <div class="container">
     <h1>Profil Sekolah</h1>
@@ -17,7 +17,7 @@ $kepsek = $cfg['kepala_sekolah'];
 
 <section class="container section">
   <div class="about">
-    <img src="<?= img('gedung.jpg', 'Gedung sekolah') ?>" alt="Gedung sekolah">
+    <img src="<?= img('umum', $cfg['gedung'], 'Gedung sekolah') ?>" alt="Gedung sekolah">
     <div>
       <h2>Tentang <?= e($cfg['nama_sekolah']) ?></h2>
       <p><?= e($cfg['tentang']) ?></p>
@@ -49,7 +49,7 @@ $kepsek = $cfg['kepala_sekolah'];
 
   <h2 class="mt">Profil Kepala Sekolah</h2>
   <div class="kepsek">
-    <img src="<?= img($kepsek['foto'], 'Foto Kepala Sekolah') ?>" alt="Foto <?= e($kepsek['nama']) ?>">
+    <img src="<?= img('umum', $kepsek['foto'], 'Foto Kepala Sekolah') ?>" alt="Foto <?= e($kepsek['nama']) ?>">
     <div>
       <h3><?= e($kepsek['nama']) ?></h3>
       <span class="kepsek-role"><?= e($kepsek['jabatan']) ?></span>

@@ -3,19 +3,15 @@ $halaman = 'galeri';
 $judul = 'Galeri Foto';
 require __DIR__ . '/includes/header.php';
 
-// Galeri = foto dari daftar kegiatan + prestasi di includes/konten.php
+// Galeri = view v_galeri (gabungan tabel kegiatan + prestasi) di database
 $kategori = ['Kegiatan', 'Prestasi'];
 $filter = $_GET['kategori'] ?? '';
 if (!in_array($filter, $kategori, true)) $filter = '';
 
-$foto = [];
-foreach ($cfg['kegiatan'] as $x) $foto[] = $x + ['kategori' => 'Kegiatan'];
-foreach ($cfg['prestasi'] as $x) $foto[] = $x + ['kategori' => 'Prestasi'];
-if ($filter) $foto = array_filter($foto, fn($f) => $f['kategori'] === $filter);
-$foto = urut_tanggal($foto);
+$foto = muat_galeri($filter);
 ?>
 
-<section class="page-banner" style="background-image:url('<?= img($cfg['hero']['galeri'], 'Banner') ?>')">
+<section class="page-banner" style="background-image:url('<?= img('umum', $cfg['hero']['galeri'], 'Banner') ?>')">
   <div class="hero-overlay"></div>
   <div class="container">
     <h1>Galeri Foto</h1>
@@ -34,7 +30,7 @@ $foto = urut_tanggal($foto);
   <div class="gallery">
     <?php foreach ($foto as $f): ?>
       <figure class="gallery-item" data-caption="<?= e($f['judul']) ?> — <?= tanggal_indo($f['tanggal']) ?>">
-        <img src="<?= img($f['foto'], $f['judul']) ?>" alt="<?= e($f['judul']) ?>" loading="lazy">
+        <img src="<?= img($f['folder'], $f['foto'], $f['judul']) ?>" alt="<?= e($f['judul']) ?>" loading="lazy">
         <figcaption><?= e($f['judul']) ?></figcaption>
       </figure>
     <?php endforeach; ?>

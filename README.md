@@ -1,58 +1,65 @@
 # Website SMKN 5 Palopo
 
-Website profil sekolah berbasis **PHP**. Halaman: Beranda, Profil, Jurusan (+ detail), Galeri, dan Kontak.
-Semua isi website ada di **satu file**: `includes/konten.php`. Database hanya dipakai untuk menyimpan pesan dari form kontak.
+Website profil sekolah (PHP + MySQL) dengan panel admin. **Semua isi website disimpan di database** dan
+diubah lewat panel admin — website publik dan admin memakai config, koneksi database, dan folder gambar yang sama.
 
 ## Struktur Folder
 ```
-smkn5palopo-website/
-├── index.php            # Beranda
-├── profil.php           # Profil sekolah
-├── jurusan.php          # Daftar program keahlian
-├── jurusan_detail.php   # Detail satu jurusan (tombol Selengkapnya)
-├── galeri.php           # Galeri kegiatan & prestasi
-├── kontak.php           # Kontak + form pesan
-├── includes/
-│   ├── konten.php       # ★ SEMUA ISI WEBSITE (teks, jurusan, kegiatan, prestasi)
-│   ├── config.php       # Pengaturan database (pesan) & fungsi bantu
-│   ├── header.php
-│   └── footer.php
+smkn5palopo/
+├── index.php  profil.php  jurusan.php  jurusan_detail.php  galeri.php  kontak.php   ← halaman website
+├── config/                  ← SATU-SATUNYA tempat pengaturan teknis (dipakai website & admin)
+│   ├── app.php              #   user/password database, token WhatsApp, batas upload
+│   ├── database.php         #   koneksi PDO: db()
+│   └── helpers.php          #   e(), tanggal_indo(), img(), simpan_gambar(), baris()
+├── includes/                ← bagian khusus website publik
+│   ├── init.php  data.php   #   memuat seluruh isi website dari database ke $cfg
+│   └── header.php  footer.php
+├── admin/                   ← panel admin (folder sendiri, memakai config/ di atas)
+│   ├── login.php  index.php  pesan.php  kegiatan.php  prestasi.php  jurusan.php
+│   ├── profil.php  kepsek.php  fasilitas.php  kontak.php  pengaturan.php  password.php
+│   ├── includes/            #   auth (session + CSRF), layout, CRUD generik
+│   └── assets/              #   css & js admin
 ├── assets/
-│   ├── css/style.css
-│   ├── js/main.js
-│   └── img/             # Foto (logo, hero, gedung, kegiatan, prestasi, jurusan)
-├── database/
-│   └── pesan.sql        # Membuat database + tabel pesan (form kontak)
-├── README.md
-└── .gitignore
+│   ├── css/  js/
+│   └── img/
+│       ├── umum/            #   logo, banner, foto gedung, foto kepala sekolah
+│       ├── jurusan/         #   foto program keahlian
+│       ├── kegiatan/        #   foto kegiatan
+│       └── prestasi/        #   foto prestasi
+└── database/
+    └── smkn_5_palopo.sql    ← struktur + data awal (satu file)
 ```
 
+## Struktur Database (relasi)
+```
+profil_sekolah 1──1 kontak            (alamat, telepon, jam buka, sosmed, WhatsApp tujuan)
+profil_sekolah 1──1 kepala_sekolah
+program_keahlian 1──N poin_jurusan    (kompetensi & prospek karier)
+kegiatan + prestasi ──► v_galeri      (view untuk halaman Galeri)
+pengaturan  (slogan, tagline, logo, banner)      fasilitas      pesan      admin
+```
+| Isi website | Tabel | Menu admin |
+|---|---|---|
+| Nama, tentang, sejarah, visi, misi, tahun berdiri, jumlah siswa/guru | `profil_sekolah` | Profil Sekolah |
+| Kepala sekolah | `kepala_sekolah` | Kepala Sekolah |
+| Alamat, telepon, email, jam buka, YouTube/Instagram/Facebook, nomor WhatsApp | `kontak` | Kontak |
+| Slogan, tagline, logo, banner tiap halaman, foto gedung | `pengaturan` | Tampilan Website |
+| Fasilitas | `fasilitas` | Fasilitas |
+| Jurusan + kompetensi + karier | `program_keahlian`, `poin_jurusan` | Program Keahlian |
+| Kegiatan / Prestasi | `kegiatan` / `prestasi` | Kegiatan / Prestasi |
+| Pesan dari form Kontak | `pesan` | Pesan Masuk |
+| Akun admin | `admin` | Akun & Password |
+
 ## Cara Menjalankan (Laragon / XAMPP)
-1. Salin folder proyek ke `C:\laragon\www\` (Laragon) atau `htdocs` (XAMPP).
-2. Jalankan **Apache** dan **MySQL**.
-3. Import `database/pesan.sql` (HeidiSQL: *File → Run SQL file…*, atau phpMyAdmin: tab *Import*).
-   Langkah ini hanya diperlukan agar form kontak bisa menyimpan pesan. Halaman lain tampil tanpa database.
-4. Jika perlu, sesuaikan port/user/password di `includes/config.php` (bawaan: port `3306`, user `root`, tanpa password).
-5. Buka `http://localhost/smkn5palopo-website/`.
+1. Salin folder ke `C:\laragon\www\` (Laragon) atau `htdocs` (XAMPP), jalankan **Apache** dan **MySQL**.
+2. Import **`database/smkn_5_palopo.sql`** (HeidiSQL: *File → Run SQL file…*, atau phpMyAdmin: *Import*).
+   File ini membuat database `smkn_5_palopo` sekaligus mengisinya. **Tabel lama (termasuk `tabel_*`) dihapus dan dibuat ulang.**
+3. Jika perlu, ubah user/password/port MySQL di **`config/app.php`** (bawaan: port 3306, user `root`, tanpa password).
+4. Website: `http://localhost/smkn5palopo/`  ·  Admin: `http://localhost/smkn5palopo/admin/`
+5. Login admin awal: **admin / admin123** → segera ganti di menu *Akun & Password*.
 
-## Mengubah Isi Website — semuanya di `includes/konten.php`
-| Isi | Bagian di konten.php |
-|---|---|
-| Nama sekolah, slogan, tagline | `nama_sekolah`, `slogan`, `tagline` |
-| Tentang, tahun berdiri, jumlah siswa/guru | `tentang`, `tahun_berdiri`, `jumlah_siswa`, `jumlah_guru` |
-| Sejarah, visi, misi | `sejarah`, `visi`, `misi` (satu poin per baris) |
-| Alamat, telepon, email, jam operasional, link sosmed | `alamat`, `telepon`, `email`, `jam_*`, `youtube`, `instagram`, `facebook` |
-| Gambar hero/banner tiap halaman | `hero` |
-| Jurusan + halaman detail | `jurusan` (nama, deskripsi, uraian, kompetensi, karier, gambar) |
-| Kegiatan | `kegiatan` |
-| Prestasi | `prestasi` |
-
-Untuk menambah jurusan/kegiatan/prestasi, salin satu blok lalu ubah isinya.
-Simpan file, lalu refresh browser.
-
-## Foto
-Simpan di `assets/img/` dengan nama huruf kecil tanpa spasi (mis. `kegiatan4.jpg`), lalu tulis nama filenya
-di `konten.php`. Jika file belum ada, tampil placeholder biru. File tetap: `logo.png` dan `gedung.jpg` (foto di halaman Profil). Gambar hero tiap halaman diatur di bagian `hero` pada `konten.php`.
-
-## Melihat Pesan Masuk
-Buka HeidiSQL/phpMyAdmin → database `smkn_5_palopo` → tabel `tabel_pesan`.
+## Catatan
+- Foto yang diunggah dari admin otomatis masuk ke sub-folder yang sesuai di `assets/img/`. Jika file foto belum ada, website menampilkan placeholder biru.
+- Foto jurusan ULP (`assets/img/jurusan/ulp.jpg`) belum ada — unggah lewat admin: Program Keahlian → Ubah.
+- WhatsApp otomatis (Fonnte): isi `FONNTE_TOKEN` di `config/app.php`; nomor tujuan diatur di admin (menu Kontak).
+- Jika database mati, website menampilkan pesan "belum dapat dibuka" (bukan error PHP).

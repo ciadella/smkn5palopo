@@ -1,24 +1,17 @@
 <?php
 ob_start();
 
-// ==== PENGATURAN WHATSAPP OTOMATIS (FONNTE) ====
-// Daftar di https://fonnte.com, tambahkan device (scan QR), lalu salin TOKEN-nya ke sini
-$fonnte_token = ''; // contoh: 'AbCdEf123456'  (kosong = buka WhatsApp manual)
-
-// Nomor TUJUAN penerima pesan (format 62, tanpa + / spasi / tanda hubung)
-$nomor_wa = '6281774157317';
-
-// true = hanya untuk localhost jika muncul error SSL. Ubah ke false saat sudah online.
-$abaikan_ssl_lokal = true;
-
-// ==== LINK MEDIA SOSIAL ====
-$link_instagram = 'https://www.instagram.com/smkn_5_palopo?cplk=YTFlY3k5cTNlNG0w';
-$link_facebook  = 'https://www.facebook.com/share/19jWLVEGxM/?mibextid=wwXIfr';
-$link_youtube   = 'https://youtube.com/@smkn5palopo?si=SHNvBK8KBMzRn8bk';
-
 $halaman = 'kontak';
 $judul = 'Tentang & Kontak';
 require __DIR__ . '/includes/header.php';
+
+// Pengaturan WhatsApp (token Fonnte) ada di config/app.php; nomor tujuan & link sosmed diatur dari admin (menu Kontak).
+$fonnte_token      = FONNTE_TOKEN;
+$abaikan_ssl_lokal = ABAIKAN_SSL_LOKAL;
+$nomor_wa          = preg_replace('/\D+/', '', $cfg['whatsapp']);
+$link_instagram    = $cfg['instagram'];
+$link_facebook     = $cfg['facebook'];
+$link_youtube      = $cfg['youtube'];
 
 $notif = '';
 $error = '';
@@ -68,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // 1) Simpan ke database (kalau gagal, tetap lanjut)
         try {
-            $stmt = db()->prepare('INSERT INTO tabel_pesan (nama, email, isi) VALUES (?, ?, ?)');
+            $stmt = db()->prepare('INSERT INTO pesan (nama, email, isi) VALUES (?, ?, ?)');
             $stmt->execute([$nama, $email, $isi]);
         } catch (PDOException $ex) {
             error_log('Gagal simpan pesan: ' . $ex->getMessage());
@@ -79,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               . "Email: $email\n"
               . "Pesan: $isi";
 
-        if ($fonnte_token !== '') {
+        if ($fonnte_token !== '' && $nomor_wa !== '') {
             // 2a) Kirim OTOMATIS ke WhatsApp tujuan
             [$ok, $ket] = kirim_wa_fonnte($fonnte_token, $nomor_wa, $teks, $abaikan_ssl_lokal);
             if ($ok) {
@@ -98,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<section class="page-banner" style="background-image:url('<?= img($cfg['hero']['kontak'], 'Banner') ?>')">
+<section class="page-banner" style="background-image:url('<?= img('umum', $cfg['hero']['kontak'], 'Banner') ?>')">
   <div class="hero-overlay"></div>
   <div class="container">
     <h1>Tentang &amp; Kontak</h1>

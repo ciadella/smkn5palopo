@@ -3,10 +3,10 @@ $halaman = 'beranda';
 $judul = 'Beranda';
 require __DIR__ . '/includes/header.php';
 
-$kegiatan = array_slice(urut_tanggal($cfg['kegiatan']), 0, 3);
+$kegiatan = array_slice($cfg['kegiatan'], 0, 3);   // sudah urut terbaru dari database
 ?>
 
-<section class="hero" style="background-image:url('<?= img($cfg['hero']['beranda'], '') ?>')">
+<section class="hero" style="background-image:url('<?= img('umum', $cfg['hero']['beranda']) ?>')">
   <div class="hero-overlay"></div>
   <div class="container hero-content">
     <p class="hero-small">Selamat Datang di</p>
@@ -47,7 +47,7 @@ $kegiatan = array_slice(urut_tanggal($cfg['kegiatan']), 0, 3);
   <div class="grid-3">
     <?php foreach ($kegiatan as $k): ?>
       <article class="news-card">
-        <img src="<?= img($k['foto'], 'Kegiatan') ?>" alt="<?= e($k['judul']) ?>">
+        <img src="<?= img('kegiatan', $k['foto'], 'Kegiatan') ?>" alt="<?= e($k['judul']) ?>">
         <time><?= tanggal_indo($k['tanggal']) ?></time>
         <h3><?= e($k['judul']) ?></h3>
       </article>
