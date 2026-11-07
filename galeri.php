@@ -11,7 +11,7 @@ if (!in_array($filter, $kategori, true)) $filter = '';
 $foto = muat_galeri($filter);
 ?>
 
-<section class="page-banner" style="background-image:url('<?= img('umum', $cfg['hero']['galeri'], 'Banner') ?>')">
+<section class="page-banner" <?= $cfg['hero']['galeri'] !== '' ? 'style="background-image:url(\'' . img_db('umum', $cfg['hero']['galeri']) . '\')"' : '' ?>>
   <div class="hero-overlay"></div>
   <div class="container">
     <h1>Galeri Foto</h1>

@@ -7,7 +7,7 @@ $misi = $cfg['misi'];
 $kepsek = $cfg['kepala_sekolah'];
 ?>
 
-<section class="page-banner" style="background-image:url('<?= img('umum', $cfg['hero']['profil'], 'Banner') ?>')">
+<section class="page-banner" <?= $cfg['hero']['profil'] !== '' ? 'style="background-image:url(\'' . img_db('umum', $cfg['hero']['profil']) . '\')"' : '' ?>>
   <div class="hero-overlay"></div>
   <div class="container">
     <h1>Profil Sekolah</h1>
@@ -16,20 +16,25 @@ $kepsek = $cfg['kepala_sekolah'];
 </section>
 
 <section class="container section">
+  <?php if ($cfg['gedung'] !== '' || $cfg['tentang'] !== ''): ?>
   <div class="about">
-    <img src="<?= img('umum', $cfg['gedung'], 'Gedung sekolah') ?>" alt="Gedung sekolah">
+    <?php if ($cfg['gedung'] !== ''): ?><img src="<?= img_db('umum', $cfg['gedung'], 'Gedung sekolah') ?>" alt="Gedung sekolah"><?php endif; ?>
     <div>
       <h2>Tentang <?= e($cfg['nama_sekolah']) ?></h2>
       <p><?= e($cfg['tentang']) ?></p>
     </div>
   </div>
+  <?php endif; ?>
 
+  <?php if ($cfg['tahun_berdiri'] . $cfg['jumlah_siswa'] . $cfg['jumlah_guru'] !== ''): ?>
   <div class="stats">
     <div class="stat"><span class="stat-icon">📅</span><div><small>Tahun Berdiri</small><strong><?= e($cfg['tahun_berdiri']) ?></strong></div></div>
     <div class="stat"><span class="stat-icon">👥</span><div><small>Jumlah Siswa</small><strong><?= e($cfg['jumlah_siswa']) ?></strong></div></div>
     <div class="stat"><span class="stat-icon">👤</span><div><small>Jumlah Guru</small><strong><?= e($cfg['jumlah_guru']) ?></strong></div></div>
   </div>
+  <?php endif; ?>
 
+  <?php if ($cfg['visi'] !== '' || $misi): ?>
   <h2 class="mt">Visi &amp; Misi</h2>
   <div class="visimisi">
     <div class="vm-box">
@@ -43,13 +48,17 @@ $kepsek = $cfg['kepala_sekolah'];
       </ol>
     </div>
   </div>
+  <?php endif; ?>
 
+  <?php if ($cfg['sejarah'] !== ''): ?>
   <h2 class="mt">Sejarah Singkat</h2>
   <p class="history"><?= nl2br(e($cfg['sejarah'])) ?></p>
+  <?php endif; ?>
 
+  <?php if ($kepsek['nama'] !== ''): ?>
   <h2 class="mt">Profil Kepala Sekolah</h2>
   <div class="kepsek">
-    <img src="<?= img('umum', $kepsek['foto'], 'Foto Kepala Sekolah') ?>" alt="Foto <?= e($kepsek['nama']) ?>">
+    <?php if ($kepsek['foto'] !== ''): ?><img src="<?= img_db('umum', $kepsek['foto'], 'Foto Kepala Sekolah') ?>" alt="Foto <?= e($kepsek['nama']) ?>"><?php endif; ?>
     <div>
       <h3><?= e($kepsek['nama']) ?></h3>
       <span class="kepsek-role"><?= e($kepsek['jabatan']) ?></span>
@@ -63,7 +72,9 @@ $kepsek = $cfg['kepala_sekolah'];
       <?php endif; ?>
     </div>
   </div>
+  <?php endif; ?>
 
+  <?php if ($cfg['fasilitas']): ?>
   <h2 class="mt">Fasilitas Sekolah</h2>
   <div class="facility-grid">
     <?php foreach ($cfg['fasilitas'] as $f): ?>
@@ -74,6 +85,7 @@ $kepsek = $cfg['kepala_sekolah'];
       </div>
     <?php endforeach; ?>
   </div>
+  <?php endif; ?>
 </section>
 
 <?php require __DIR__ . '/includes/footer.php'; ?>

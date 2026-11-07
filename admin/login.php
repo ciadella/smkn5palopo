@@ -33,15 +33,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>Masuk | Admin SMKN 5 Palopo</title>
+  <title>Masuk | Admin <?= e(info_situs()['nama']) ?></title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/admin.css">
 </head>
 <body class="login-body">
   <form method="post" class="login-card">
-    <img src="<?= e(img_admin('umum', 'logo.png', 'Logo')) ?>" alt="Logo">
+    <?php if (info_situs()['logo'] !== ''): ?><img src="<?= e(img_admin('umum', info_situs()['logo'], 'Logo')) ?>" alt="Logo"><?php endif; ?>
     <h1>Panel Admin</h1>
-    <p>SMKN 5 Palopo</p>
+    <p><?= e(info_situs()['nama']) ?></p>
     <?php if ($error): ?><div class="alert err"><?= e($error) ?></div><?php endif; ?>
     <?= csrf_field() ?>
     <div class="field"><label for="u">Username</label><input id="u" name="username" required autofocus autocomplete="username" value="<?= e($_POST['username'] ?? '') ?>"></div>

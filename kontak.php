@@ -60,10 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Mohon isi nama, email yang valid, dan pesan.';
     } else {
         // 1) Simpan ke database (kalau gagal, tetap lanjut)
+        $tersimpan = true;
         try {
             $stmt = db()->prepare('INSERT INTO pesan (nama, email, isi) VALUES (?, ?, ?)');
             $stmt->execute([$nama, $email, $isi]);
         } catch (PDOException $ex) {
+            $tersimpan = false;
             error_log('Gagal simpan pesan: ' . $ex->getMessage());
         }
 
@@ -72,7 +74,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               . "Email: $email\n"
               . "Pesan: $isi";
 
-        if ($fonnte_token !== '' && $nomor_wa !== '') {
+        if ($nomor_wa === '') {
+            // Tidak ada nomor WhatsApp di database (tabel kontak kosong/terhapus)
+            $error = $tersimpan ? 'Pesan Anda tersimpan, tetapi nomor WhatsApp tujuan belum diatur.'
+                                : 'Pesan belum dapat dikirim saat ini. Silakan coba lagi nanti.';
+        } elseif ($fonnte_token !== '') {
             // 2a) Kirim OTOMATIS ke WhatsApp tujuan
             [$ok, $ket] = kirim_wa_fonnte($fonnte_token, $nomor_wa, $teks, $abaikan_ssl_lokal);
             if ($ok) {
@@ -91,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<section class="page-banner" style="background-image:url('<?= img('umum', $cfg['hero']['kontak'], 'Banner') ?>')">
+<section class="page-banner" <?= $cfg['hero']['kontak'] !== '' ? 'style="background-image:url(\'' . img_db('umum', $cfg['hero']['kontak']) . '\')"' : '' ?>>
   <div class="hero-overlay"></div>
   <div class="container">
     <h1>Tentang &amp; Kontak</h1>
@@ -102,19 +108,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <section class="container section">
   <div class="contact-grid">
     <div>
+      <?php if ($cfg['alamat'] . $cfg['telepon'] . $cfg['email'] . $cfg['media_sosial'] . $link_youtube . $link_instagram . $link_facebook !== ''): ?>
       <h2>Informasi Kontak</h2>
       <ul class="contact-list">
-        <li><span>📍</span><div><strong>Alamat</strong><p><?= e($cfg['alamat']) ?></p></div></li>
-        <li><span>📞</span><div><strong>Telepon</strong><p><?= e($cfg['telepon']) ?></p></div></li>
-        <li><span>✉️</span><div><strong>Email</strong><p><?= e($cfg['email']) ?></p></div></li>
+        <?php if ($cfg['alamat'] !== ''): ?><li><span>📍</span><div><strong>Alamat</strong><p><?= e($cfg['alamat']) ?></p></div></li><?php endif; ?>
+        <?php if ($cfg['telepon'] !== ''): ?><li><span>📞</span><div><strong>Telepon</strong><p><?= e($cfg['telepon']) ?></p></div></li><?php endif; ?>
+        <?php if ($cfg['email'] !== ''): ?><li><span>✉️</span><div><strong>Email</strong><p><?= e($cfg['email']) ?></p></div></li><?php endif; ?>
+        <?php if ($cfg['media_sosial'] . $link_youtube . $link_instagram . $link_facebook !== ''): ?>
         <li><span>💬</span><div><strong>Media Sosial</strong>
           <p><?= e($cfg['media_sosial']) ?></p>
           <div class="social dark">
-            <a href="<?= e($link_youtube) ?>" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube">▶</a>
-            <a href="<?= e($link_instagram) ?>" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">◎</a>
-            <a href="<?= e($link_facebook) ?>" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">f</a>
+            <?php if ($link_youtube !== ''): ?><a href="<?= e($link_youtube) ?>" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube">▶</a><?php endif; ?>
+            <?php if ($link_instagram !== ''): ?><a href="<?= e($link_instagram) ?>" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">◎</a><?php endif; ?>
+            <?php if ($link_facebook !== ''): ?><a href="<?= e($link_facebook) ?>" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">f</a><?php endif; ?>
           </div></div></li>
+        <?php endif; ?>
       </ul>
+      <?php endif; ?>
     </div>
 
     <div class="form-card">
@@ -137,15 +147,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 
+  <?php if (trim($cfg['nama_sekolah'] . $cfg['lokasi_singkat']) !== '' || $cfg['jam_buka_hari'] . $cfg['jam_buka_jam'] . $cfg['jam_tutup_hari'] . $cfg['jam_tutup_ket'] !== ''): ?>
   <h2 class="mt">Lokasi Kami</h2>
   <div class="location-grid">
+    <?php if (trim($cfg['nama_sekolah'] . $cfg['lokasi_singkat']) !== ''): ?>
     <iframe class="map" loading="lazy"
       src="https://www.google.com/maps?q=<?= urlencode($cfg['nama_sekolah'] . ' ' . $cfg['lokasi_singkat']) ?>&output=embed"></iframe>
+    <?php endif; ?>
+    <?php if ($cfg['jam_buka_hari'] . $cfg['jam_buka_jam'] . $cfg['jam_tutup_hari'] . $cfg['jam_tutup_ket'] !== ''): ?>
     <div class="hours">
-      <div><span>🕒</span><div><strong>Jam Operasional</strong><p><?= e($cfg['jam_buka_hari']) ?><br><?= e($cfg['jam_buka_jam']) ?></p></div></div>
-      <div><span>🚫</span><div><strong><?= e($cfg['jam_tutup_hari']) ?></strong><p><?= e($cfg['jam_tutup_ket']) ?></p></div></div>
+      <?php if ($cfg['jam_buka_hari'] . $cfg['jam_buka_jam'] !== ''): ?><div><span>🕒</span><div><strong>Jam Operasional</strong><p><?= e($cfg['jam_buka_hari']) ?><br><?= e($cfg['jam_buka_jam']) ?></p></div></div><?php endif; ?>
+      <?php if ($cfg['jam_tutup_hari'] . $cfg['jam_tutup_ket'] !== ''): ?><div><span>🚫</span><div><strong><?= e($cfg['jam_tutup_hari']) ?></strong><p><?= e($cfg['jam_tutup_ket']) ?></p></div></div><?php endif; ?>
     </div>
+    <?php endif; ?>
   </div>
+  <?php endif; ?>
 </section>
 
 <?php require __DIR__ . '/includes/footer.php'; ?>

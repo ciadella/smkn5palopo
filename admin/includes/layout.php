@@ -18,6 +18,7 @@ const MENU = [
 
 function layout_top(string $active, string $judul): void {
     $f = flash();
+    $situs = info_situs();
     ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -25,7 +26,7 @@ function layout_top(string $active, string $judul): void {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title><?= e($judul) ?> | Admin SMKN 5 Palopo</title>
+  <title><?= e($judul) ?> | Admin <?= e($situs['nama']) ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/admin.css">
@@ -34,8 +35,8 @@ function layout_top(string $active, string $judul): void {
 <div class="shell">
   <aside class="sidebar" id="sidebar">
     <a href="index.php" class="side-brand">
-      <img src="<?= e(img_admin('umum', 'logo.png')) ?>" alt="">
-      <span><strong>SMKN 5 PALOPO</strong><small>Panel Admin</small></span>
+      <?php if ($situs['logo'] !== ''): ?><img src="<?= e(img_admin('umum', $situs['logo'])) ?>" alt=""><?php endif; ?>
+      <span><strong><?= e(mb_strtoupper($situs['nama'])) ?></strong><small>Panel Admin</small></span>
     </a>
     <nav>
       <?php foreach (MENU as $k => [$label, $href, $ico]): ?>

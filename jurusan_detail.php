@@ -17,7 +17,7 @@ if ($j) {
 }
 ?>
 
-<section class="page-banner" style="background-image:url('<?= img('umum', $cfg['hero']['jurusan'], 'Banner') ?>')">
+<section class="page-banner" <?= $cfg['hero']['jurusan'] !== '' ? 'style="background-image:url(\'' . img_db('umum', $cfg['hero']['jurusan']) . '\')"' : '' ?>>
   <div class="hero-overlay"></div>
   <div class="container">
     <h1><?= e($judul) ?></h1>

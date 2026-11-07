@@ -2,31 +2,59 @@
 /**
  * LAPISAN DATA WEBSITE PUBLIK — semua isi website dibaca dari database di sini.
  * Hasilnya satu array $cfg yang dipakai oleh halaman-halaman (index.php, profil.php, dst).
+ *
+ * PRINSIP: UI = cermin database. Tidak ada teks/gambar bawaan di kode.
+ *   - Tabel dihapus / dikosongkan  → bagian UI yang memakai tabel itu ikut hilang.
+ *   - Database dihapus / MySQL mati → seluruh isi UI kosong (rangka halaman tetap tampil).
+ * Data dibaca LANGSUNG dari database pada setiap kali halaman dibuka (tanpa cache).
  */
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/helpers.php';
 
+/** Jalankan query; bila tabel/database tidak ada → kembalikan $kosong (bukan error). */
+function aman(callable $q, $kosong = []) {
+    try {
+        return $q();
+    } catch (PDOException $ex) {
+        error_log('Database: ' . $ex->getMessage());
+        return $kosong;
+    }
+}
+
 function muat_situs(): array {
-    $db = db();
-    $p = $db->query('SELECT * FROM profil_sekolah ORDER BY id_profil LIMIT 1')->fetch() ?: [];
+    // Cek koneksi sekali saja. Gagal (database dihapus / MySQL mati) → semua kosong.
+    $db_ok = true;
+    try {
+        db();
+    } catch (PDOException $ex) {
+        error_log('Database: ' . $ex->getMessage());
+        $db_ok = false;
+    }
+
+    $kueri  = fn(string $sql) => aman(fn() => db()->query($sql)->fetchAll());
+    $satu   = fn(string $sql) => aman(fn() => db()->query($sql)->fetch() ?: [], []);
+
+    $p   = $db_ok ? $satu('SELECT * FROM profil_sekolah ORDER BY id_profil LIMIT 1') : [];
     $idp = (int)($p['id_profil'] ?? 0);
 
-    $ambil = function (string $tabel) use ($db, $idp) {
-        $s = $db->prepare("SELECT * FROM $tabel WHERE id_profil = ? LIMIT 1");
-        $s->execute([$idp]);
-        return $s->fetch() ?: [];
+    $ambil = function (string $tabel) use ($idp): array {
+        return aman(function () use ($tabel, $idp) {
+            $s = db()->prepare("SELECT * FROM $tabel WHERE id_profil = ? LIMIT 1");
+            $s->execute([$idp]);
+            return $s->fetch() ?: [];
+        }, []);
     };
-    $k = $ambil('kontak');
-    $kp = $ambil('kepala_sekolah');
-    $set = $db->query('SELECT kunci, nilai FROM pengaturan')->fetchAll(PDO::FETCH_KEY_PAIR);
+    $k   = $idp ? $ambil('kontak') : [];
+    $kp  = $idp ? $ambil('kepala_sekolah') : [];
+    $set = $db_ok ? aman(fn() => db()->query('SELECT kunci, nilai FROM pengaturan')->fetchAll(PDO::FETCH_KEY_PAIR)) : [];
 
-    // Program keahlian + poin (kompetensi & karier) dalam 2 query
+    // Program keahlian + poin (kompetensi & karier)
     $poin = [];
-    foreach ($db->query('SELECT id_jurusan, jenis, isi FROM poin_jurusan ORDER BY urutan, id_poin') as $r) {
+    foreach ($db_ok ? $kueri('SELECT id_jurusan, jenis, isi FROM poin_jurusan ORDER BY urutan, id_poin') : [] as $r) {
         $poin[$r['id_jurusan']][$r['jenis']][] = $r['isi'];
     }
     $jurusan = [];
-    foreach ($db->query('SELECT * FROM program_keahlian ORDER BY urutan, id_jurusan') as $j) {
+    foreach ($db_ok ? $kueri('SELECT * FROM program_keahlian ORDER BY urutan, id_jurusan') : [] as $j) {
         $jurusan[$j['slug']] = [
             'nama'       => $j['nama_jurusan'],
             'deskripsi'  => (string)$j['deskripsi'],
@@ -38,7 +66,7 @@ function muat_situs(): array {
     }
 
     $fasilitas = [];
-    foreach ($db->query('SELECT * FROM fasilitas ORDER BY urutan, id_fasilitas') as $f) {
+    foreach ($db_ok ? $kueri('SELECT * FROM fasilitas ORDER BY urutan, id_fasilitas') : [] as $f) {
         $fasilitas[] = ['ikon' => $f['ikon'], 'nama' => $f['nama'], 'ket' => (string)$f['keterangan']];
     }
 
@@ -50,18 +78,19 @@ function muat_situs(): array {
     ], fn($v) => $v !== '' && $v !== null);
 
     return [
-        'nama_sekolah'   => $p['nama_sekolah'] ?? 'SMKN 5 Palopo',
-        'slogan'         => $set['slogan'] ?? '',
-        'tagline'        => $set['tagline'] ?? '',
-        'lokasi_singkat' => $set['lokasi_singkat'] ?? '',
-        'logo'           => $set['logo'] ?? 'logo.png',
-        'gedung'         => $set['gambar_gedung'] ?? 'gedung.jpg',
+        'db_ok'          => $db_ok,
+        'nama_sekolah'   => (string)($p['nama_sekolah'] ?? ''),
+        'slogan'         => (string)($set['slogan'] ?? ''),
+        'tagline'        => (string)($set['tagline'] ?? ''),
+        'lokasi_singkat' => (string)($set['lokasi_singkat'] ?? ''),
+        'logo'           => (string)($set['logo'] ?? ''),
+        'gedung'         => (string)($set['gambar_gedung'] ?? ''),
         'hero' => [
-            'beranda' => $set['hero_beranda'] ?? '',
-            'profil'  => $set['hero_profil'] ?? '',
-            'jurusan' => $set['hero_jurusan'] ?? '',
-            'galeri'  => $set['hero_galeri'] ?? '',
-            'kontak'  => $set['hero_kontak'] ?? '',
+            'beranda' => (string)($set['hero_beranda'] ?? ''),
+            'profil'  => (string)($set['hero_profil'] ?? ''),
+            'jurusan' => (string)($set['hero_jurusan'] ?? ''),
+            'galeri'  => (string)($set['hero_galeri'] ?? ''),
+            'kontak'  => (string)($set['hero_kontak'] ?? ''),
         ],
         'tentang'       => (string)($p['tentang'] ?? ''),
         'tahun_berdiri' => (string)($p['tahun_berdiri'] ?? ''),
@@ -71,11 +100,11 @@ function muat_situs(): array {
         'visi'          => (string)($p['visi'] ?? ''),
         'misi'          => baris($p['misi'] ?? ''),
         'kepala_sekolah' => [
-            'nama'     => $kp['nama'] ?? '',
-            'jabatan'  => $kp['jabatan'] ?? '',
-            'foto'     => $kp['foto'] ?? '',
+            'nama'     => (string)($kp['nama'] ?? ''),
+            'jabatan'  => (string)($kp['jabatan'] ?? ''),
+            'foto'     => (string)($kp['foto'] ?? ''),
             'biodata'  => $biodata,
-            'sambutan' => $kp['sambutan'] ?? '',
+            'sambutan' => (string)($kp['sambutan'] ?? ''),
         ],
         'fasilitas'      => $fasilitas,
         'alamat'         => (string)($k['alamat'] ?? ''),
@@ -91,14 +120,27 @@ function muat_situs(): array {
         'instagram'      => (string)($k['instagram'] ?? ''),
         'facebook'       => (string)($k['facebook'] ?? ''),
         'jurusan'        => $jurusan,
-        'kegiatan'       => $db->query('SELECT judul, tanggal, deskripsi, foto FROM kegiatan ORDER BY tanggal DESC, id_kegiatan DESC')->fetchAll(),
-        'prestasi'       => $db->query('SELECT judul, tanggal, deskripsi, foto FROM prestasi ORDER BY tanggal DESC, id_prestasi DESC')->fetchAll(),
+        'kegiatan'       => $db_ok ? $kueri('SELECT judul, tanggal, deskripsi, foto FROM kegiatan ORDER BY tanggal DESC, id_kegiatan DESC') : [],
+        'prestasi'       => $db_ok ? $kueri('SELECT judul, tanggal, deskripsi, foto FROM prestasi ORDER BY tanggal DESC, id_prestasi DESC') : [],
     ];
 }
 
-/** Data galeri (view v_galeri), opsional difilter kategori 'Kegiatan' / 'Prestasi'. */
+/**
+ * Data galeri = gabungan tabel kegiatan + prestasi, opsional difilter kategori 'Kegiatan' / 'Prestasi'.
+ * Tiap tabel dibaca sendiri-sendiri: salah satu tabel hilang → hanya bagiannya yang kosong.
+ */
 function muat_galeri(string $kategori = ''): array {
-    $semua = db()->query('SELECT * FROM v_galeri ORDER BY tanggal DESC, id DESC')->fetchAll();
-    // Filter di PHP (bukan di SQL) agar tidak terkena beda collation antara view dan koneksi.
-    return $kategori === '' ? $semua : array_values(array_filter($semua, fn($r) => $r['kategori'] === $kategori));
+    $sumber = [
+        'Kegiatan' => ['kegiatan', 'id_kegiatan'],
+        'Prestasi' => ['prestasi', 'id_prestasi'],
+    ];
+    $semua = [];
+    foreach ($sumber as $kat => [$tabel, $pk]) {
+        if ($kategori !== '' && $kategori !== $kat) continue;
+        foreach (aman(fn() => db()->query("SELECT $pk AS id, judul, tanggal, deskripsi, foto FROM $tabel")->fetchAll()) as $r) {
+            $semua[] = $r + ['kategori' => $kat, 'folder' => $tabel];
+        }
+    }
+    usort($semua, fn($a, $b) => [$b['tanggal'], $b['id']] <=> [$a['tanggal'], $a['id']]);
+    return $semua;
 }

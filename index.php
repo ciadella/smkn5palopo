@@ -6,21 +6,22 @@ require __DIR__ . '/includes/header.php';
 $kegiatan = array_slice($cfg['kegiatan'], 0, 3);   // sudah urut terbaru dari database
 ?>
 
-<section class="hero" style="background-image:url('<?= img('umum', $cfg['hero']['beranda']) ?>')">
+<section class="hero" <?= $cfg['hero']['beranda'] !== '' ? 'style="background-image:url(\'' . img_db('umum', $cfg['hero']['beranda']) . '\')"' : '' ?>>
   <div class="hero-overlay"></div>
   <div class="container hero-content">
-    <p class="hero-small">Selamat Datang di</p>
+    <?php if ($cfg['nama_sekolah'] !== ''): ?><p class="hero-small">Selamat Datang di</p><?php endif; ?>
     <h1><?= e($cfg['nama_sekolah']) ?></h1>
     <p class="hero-desc"><?= e($cfg['tagline']) ?></p>
-    <a href="profil.php" class="btn btn-primary">Jelajahi Sekolah →</a>
+    <?php if ($cfg['nama_sekolah'] !== ''): ?><a href="profil.php" class="btn btn-primary">Jelajahi Sekolah →</a><?php endif; ?>
   </div>
 </section>
 
+<?php if ($cfg['nama_sekolah'] !== '' || $cfg['jurusan'] || $cfg['prestasi']): ?>
 <section class="container quick">
   <a class="quick-card" href="profil.php">
     <div class="quick-icon">📘</div>
     <h3>Profil Sekolah</h3>
-    <p>Kenali lebih dekat tentang <?= e($cfg['nama_sekolah']) ?></p>
+    <p>Kenali lebih dekat tentang <?= e($cfg['nama_sekolah'] ?: 'sekolah kami') ?></p>
   </a>
   <a class="quick-card" href="jurusan.php">
     <div class="quick-icon">🎓</div>
@@ -30,7 +31,7 @@ $kegiatan = array_slice($cfg['kegiatan'], 0, 3);   // sudah urut terbaru dari da
   <a class="quick-card" href="galeri.php?kategori=Prestasi">
     <div class="quick-icon">🏆</div>
     <h3>Prestasi</h3>
-    <p>Raih prestasi bersama <?= e($cfg['nama_sekolah']) ?></p>
+    <p>Raih prestasi bersama <?= e($cfg['nama_sekolah'] ?: 'kami') ?></p>
   </a>
   <a class="quick-card" href="kontak.php">
     <div class="quick-icon">📋</div>
@@ -38,7 +39,9 @@ $kegiatan = array_slice($cfg['kegiatan'], 0, 3);   // sudah urut terbaru dari da
     <p>Informasi pendaftaran peserta didik baru</p>
   </a>
 </section>
+<?php endif; ?>
 
+<?php if ($kegiatan): ?>
 <section class="container section">
   <div class="section-head">
     <h2>Kegiatan Terbaru</h2>
@@ -52,8 +55,8 @@ $kegiatan = array_slice($cfg['kegiatan'], 0, 3);   // sudah urut terbaru dari da
         <h3><?= e($k['judul']) ?></h3>
       </article>
     <?php endforeach; ?>
-    <?php if (!$kegiatan): ?><p>Belum ada kegiatan.</p><?php endif; ?>
   </div>
 </section>
+<?php endif; ?>
 
 <?php require __DIR__ . '/includes/footer.php'; ?>

@@ -14,7 +14,7 @@ layout_top('dashboard', 'Dashboard');
 ?>
 <div class="welcome card">
   <div><h2>Selamat datang, <?= e($_SESSION['admin_nama']) ?> 👋</h2>
-  <p>Kelola isi website SMKN 5 Palopo dari satu tempat.</p></div>
+  <p>Kelola isi website <?= e(info_situs()['nama'] ?: 'sekolah') ?> dari satu tempat.</p></div>
   <a href="../index.php" target="_blank" rel="noopener" class="btn btn-gold">Lihat Website ↗</a>
 </div>
 <div class="stats">

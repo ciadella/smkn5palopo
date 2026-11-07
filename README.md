@@ -59,7 +59,7 @@ pengaturan  (slogan, tagline, logo, banner)      fasilitas      pesan      admin
 5. Login admin awal: **admin / admin123** → segera ganti di menu *Akun & Password*.
 
 ## Catatan
+- **UI = cermin database.** Isi website dibaca langsung dari database setiap halaman dibuka (tanpa cache) dan tidak ada teks/gambar bawaan di kode. Hapus tabel/baris → bagian itu hilang dari website; hapus database (atau MySQL mati) → seluruh isi kosong dan muncul pemberitahuan. Impor ulang `database/smkn_5_palopo.sql` untuk memulihkan.
 - Foto yang diunggah dari admin otomatis masuk ke sub-folder yang sesuai di `assets/img/`. Jika file foto belum ada, website menampilkan placeholder biru.
 - Foto jurusan ULP (`assets/img/jurusan/ulp.jpg`) belum ada — unggah lewat admin: Program Keahlian → Ubah.
 - WhatsApp otomatis (Fonnte): isi `FONNTE_TOKEN` di `config/app.php`; nomor tujuan diatur di admin (menu Kontak).
-- Jika database mati, website menampilkan pesan "belum dapat dibuka" (bukan error PHP).

@@ -39,6 +39,11 @@ function img(string $folder, ?string $file, string $label = '', string $dari = '
     return 'data:image/svg+xml;base64,' . base64_encode($svg);
 }
 
+/** Seperti img(), tetapi nama file kosong → string kosong (tidak ada gambar), bukan placeholder. */
+function img_db(string $folder, ?string $file, string $label = '', string $dari = ''): string {
+    return trim((string)$file) === '' ? '' : img($folder, $file, $label, $dari);
+}
+
 /** Simpan gambar upload ke assets/img/<folder>/. Return nama file, atau null (isi $error bila gagal). */
 function simpan_gambar(array $file, string $folder, ?string &$error): ?string {
     if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) return null;

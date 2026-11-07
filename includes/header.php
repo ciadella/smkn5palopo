@@ -2,6 +2,7 @@
 require_once __DIR__ . '/init.php';
 $halaman = $halaman ?? 'beranda';
 $judul   = $judul ?? $cfg['nama_sekolah'];
+$judul_tab = trim($judul . ($cfg['nama_sekolah'] !== '' ? ' | ' . $cfg['nama_sekolah'] : ''), ' |');
 
 function aktif(string $a, string $b): string { return $a === $b ? 'active' : ''; }
 ?>
@@ -10,7 +11,7 @@ function aktif(string $a, string $b): string { return $a === $b ? 'active' : '';
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= e($judul) ?> | <?= e($cfg['nama_sekolah']) ?></title>
+  <title><?= e($judul_tab) ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
@@ -20,7 +21,7 @@ function aktif(string $a, string $b): string { return $a === $b ? 'active' : '';
 <header class="navbar">
   <div class="container nav-inner">
     <a href="index.php" class="brand">
-      <img src="<?= img('umum', $cfg['logo'], 'Logo') ?>" alt="Logo" class="brand-logo">
+      <?php if ($cfg['logo'] !== ''): ?><img src="<?= img_db('umum', $cfg['logo'], 'Logo') ?>" alt="Logo" class="brand-logo"><?php endif; ?>
       <span class="brand-text">
         <strong><?= e($cfg['nama_sekolah']) ?></strong>
         <small><?= e($cfg['slogan']) ?></small>
@@ -37,3 +38,8 @@ function aktif(string $a, string $b): string { return $a === $b ? 'active' : '';
     </nav>
   </div>
 </header>
+<?php if (!$cfg['db_ok']): ?>
+<div style="background:#fff3cd;color:#664d03;text-align:center;padding:10px 16px;font-size:14px">
+  Database tidak ditemukan / tidak terhubung — isi website kosong. Impor <code>database/smkn_5_palopo.sql</code> untuk mengisinya kembali.
+</div>
+<?php endif; ?>
