@@ -208,3 +208,13 @@ h2::after{content:"";position:absolute;left:0;bottom:0;width:46px;height:3px;bor
   .quick,.grid-3,.grid-2,.stats{grid-template-columns:1fr}
   .biodata>div{grid-template-columns:1fr;gap:0}
 }
+.nav-menu .nav-login {
+  background: #e0b84a;      /* samakan dengan warna emas tombol "Jelajahi Sekolah" */
+  color: #1a2f6b;           /* samakan dengan warna biru situs */
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: opacity .2s;
+}
+.nav-menu .nav-login:hover { opacity: .85; }

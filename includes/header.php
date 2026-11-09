@@ -12,7 +12,8 @@ function aktif(string $a, string $b): string { return $a === $b ? 'active' : '';
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($judul_tab) ?></title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="icon" type="image/png" href="/smkn5palopo/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -34,7 +35,7 @@ function aktif(string $a, string $b): string { return $a === $b ? 'active' : '';
       <a href="jurusan.php" class="<?= aktif($halaman,'jurusan') ?>">Jurusan</a>
       <a href="galeri.php" class="<?= aktif($halaman,'galeri') ?>">Galeri</a>
       <a href="kontak.php" class="<?= aktif($halaman,'kontak') ?>">Kontak</a>
-      <a href="galeri.php" class="nav-search" aria-label="Cari">🔍</a>
+      <a href="admin/login.php" class="nav-login">Login Admin</a>
     </nav>
   </div>
 </header>
